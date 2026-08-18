@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Cloud,
   Code2,
+  CircleHelp,
   Copy,
   Database,
   FileText,
@@ -23,6 +24,7 @@ import {
   Sparkles,
   Zap,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const STACK = [
   "Python",
@@ -36,10 +38,30 @@ const STACK = [
 ];
 
 const METRICS = [
-  { value: "12,480", label: "resumes parsed", note: "illustrative target" },
-  { value: "18,920", label: "job descriptions indexed", note: "illustrative target" },
-  { value: "142 ms", label: "median API latency", note: "illustrative target" },
-  { value: "500", label: "concurrent requests", note: "illustrative target" },
+  {
+    value: "12,480",
+    label: "resumes parsed",
+    note: "illustrative target",
+    calculation: "Count unique resume-ingestion jobs that completed parsing, validation, and persistence during the reporting period. Exclude retries and failed uploads.",
+  },
+  {
+    value: "18,920",
+    label: "job descriptions indexed",
+    note: "illustrative target",
+    calculation: "Count unique job descriptions with a successful normalized record and stored embedding. Deduplicate reposts using a source ID and content hash.",
+  },
+  {
+    value: "142 ms",
+    label: "median API latency",
+    note: "illustrative target",
+    calculation: "Calculate the 50th-percentile end-to-end server response time across successful API requests in a production-like load test, excluding warm-up traffic.",
+  },
+  {
+    value: "500",
+    label: "concurrent requests",
+    note: "illustrative target",
+    calculation: "Record the highest sustained in-flight request count over a 10-minute load run while maintaining a target error rate below 1% and defined latency SLOs.",
+  },
 ];
 
 const FLOW = [
@@ -71,12 +93,69 @@ const BULLETS = [
   "Deployed the platform on AWS through CI/CD pipelines and maintained a 99.2% successful deployment and health-check rate across tracked runs.",
 ];
 
-function MetricTile({ value, label, note }: (typeof METRICS)[number]) {
+const OUTCOMES = [
+  {
+    icon: Gauge,
+    label: "PERFORMANCE",
+    value: "142 ms",
+    text: "median latency, engineered to keep matching flow responsive under realistic load.",
+    calculation: "The p50 response time from successful, representative API calls. Report alongside p95 and p99 latency for a complete performance picture.",
+  },
+  {
+    icon: Layers3,
+    label: "EFFICIENCY",
+    value: "46%",
+    text: "fewer repeated LLM/API calls through Redis-aware cache design.",
+    calculation: "(Baseline eligible external calls − cached eligible external calls) ÷ baseline eligible external calls. Compare equivalent traffic windows before and after caching.",
+  },
+  {
+    icon: Code2,
+    label: "QUALITY",
+    value: "84%",
+    text: "backend test coverage across services and integration-critical behavior.",
+    calculation: "Covered executable lines divided by total executable lines, reported by the backend coverage tool after automated tests run. Track branch coverage separately where possible.",
+  },
+  {
+    icon: GitBranch,
+    label: "RELIABILITY",
+    value: "99.2%",
+    text: "successful AWS deployment and health-check rate across tracked CI/CD runs.",
+    calculation: "Successful deployments with a passing post-deploy health check divided by all completed deployment attempts in the reporting window, excluding cancelled runs.",
+  },
+];
+
+function MetricTooltip({ calculation, metric }: { calculation: string; metric: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          className="metric-info-button"
+          aria-label={`How ${metric} is calculated`}
+        >
+          <CircleHelp size={14} strokeWidth={1.8} />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent
+        side="top"
+        sideOffset={11}
+        className="metric-tooltip max-w-[270px] rounded-none border border-[#c7ff3d]/65 bg-[#101520] px-3.5 py-3 text-[#f4f4ed] shadow-[0_12px_28px_rgba(16,21,32,.28)]"
+      >
+        <p className="m-0 font-[DM_Mono] text-[9px] tracking-[.09em] text-[#c7ff3d]">HOW THIS IS CALCULATED</p>
+        <p className="mt-2 mb-0 text-[11px] leading-[1.55] text-[#f4f4ed]/80">{calculation}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function MetricTile({ value, label, note, calculation }: (typeof METRICS)[number]) {
   return (
     <article className="metric-tile group">
       <div className="flex items-center justify-between gap-3">
         <span className="evidence-tag">BENCHMARK / TARGET</span>
-        <span className="h-2 w-2 rounded-full bg-[#c7ff3d] shadow-[0_0_0_4px_rgba(199,255,61,0.15)]" />
+        <div className="flex items-center gap-2">
+          <MetricTooltip metric={label} calculation={calculation} />
+          <span className="h-2 w-2 rounded-full bg-[#c7ff3d] shadow-[0_0_0_4px_rgba(199,255,61,0.15)]" />
+        </div>
       </div>
       <p className="metric-value">{value}</p>
       <p className="metric-label">{label}</p>
@@ -149,7 +228,7 @@ export default function Home() {
             <aside className="hero-proof" aria-label="Platform benchmark target">
               <div className="proof-heading">
                 <span className="evidence-tag">SYSTEM / ONLINE</span>
-                <span className="proof-dot" />
+                <div className="flex items-center gap-2"><MetricTooltip metric="semantic job-match relevance" calculation="Use blinded human ratings to label top-ranked job recommendations as relevant or not relevant. Divide relevant recommendations by all evaluated recommendations in the fixed test set." /><span className="proof-dot" /></div>
               </div>
               <p className="proof-number">89<span>%</span></p>
               <p className="proof-label">semantic job-match relevance</p>
@@ -232,7 +311,7 @@ export default function Home() {
           </div>
           <div className="evidence-lower">
             <div className="benchmark-card">
-              <div className="benchmark-card-top"><span className="evidence-tag">EVALUATION / TARGET</span><BrainCircuit size={19} /></div>
+              <div className="benchmark-card-top"><span className="evidence-tag">EVALUATION / TARGET</span><div className="flex items-center gap-2"><MetricTooltip metric="structured-output success rate" calculation="Divide workflow runs that return valid, schema-conforming structured output by all non-cancelled workflow runs. Log parser failures and retry outcomes separately." /><BrainCircuit size={19} /></div></div>
               <div className="benchmark-score"><b>97.6%</b><span>successful<br />structured output</span></div>
               <div className="mini-bars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
               <p>Designed to be measured on schema validity, relevance, and human review—not output volume alone.</p>
@@ -247,10 +326,10 @@ export default function Home() {
         <section className="outcomes-section">
           <div className="outcome-intro"><p className="eyebrow"><span /> 03 / ENGINEERING OUTCOMES</p><h2>Build for fast answers.<br />Prove the hard parts.</h2></div>
           <div className="outcome-list">
-            <article><Gauge size={20} /><div><span>PERFORMANCE</span><p><strong>142 ms</strong> median latency, engineered to keep matching flow responsive under realistic load.</p></div></article>
-            <article><Layers3 size={20} /><div><span>EFFICIENCY</span><p><strong>46%</strong> fewer repeated LLM/API calls through Redis-aware cache design.</p></div></article>
-            <article><Code2 size={20} /><div><span>QUALITY</span><p><strong>84%</strong> backend test coverage across services and integration-critical behavior.</p></div></article>
-            <article><GitBranch size={20} /><div><span>RELIABILITY</span><p><strong>99.2%</strong> successful AWS deployment and health-check rate across tracked CI/CD runs.</p></div></article>
+            {OUTCOMES.map((outcome) => {
+              const Icon = outcome.icon;
+              return <article key={outcome.label}><Icon size={20} /><div><div className="outcome-label-row"><span>{outcome.label}</span><MetricTooltip metric={outcome.label.toLowerCase()} calculation={outcome.calculation} /></div><p><strong>{outcome.value}</strong> {outcome.text}</p></div></article>;
+            })}
           </div>
         </section>
 

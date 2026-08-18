@@ -154,6 +154,10 @@ h2 { font-size: clamp(3rem, 5.1vw, 5.2rem); line-height: .92; }
 .metric-tile { min-height: 230px; padding: 18px; border-right: 1px solid rgba(244,244,237,.25); border-bottom: 1px solid rgba(244,244,237,.25); transition: background 180ms ease-out, transform 180ms ease-out; }
 .metric-tile:hover { background: #1547ab; transform: translateY(-4px); }
 .metric-tile .evidence-tag, .metric-note { color: rgba(244,244,237,.54); }
+.metric-info-button { display: inline-grid; place-items: center; width: 22px; height: 22px; padding: 0; border: 1px solid currentColor; border-radius: 50%; background: transparent; color: rgba(244,244,237,.78); transition: background 160ms ease-out, color 160ms ease-out, transform 160ms ease-out; }
+.metric-info-button:hover, .metric-info-button:focus-visible { background: #c7ff3d; color: #101520; outline: none; transform: translateY(-1px); }
+.metric-info-button:focus-visible { box-shadow: 0 0 0 3px rgba(199,255,61,.3); }
+.metric-tooltip { z-index: 60; }
 .metric-value { margin: 52px 0 0; font-family: "Instrument Serif", Georgia, serif; font-size: clamp(3.2rem, 5vw, 5.4rem); line-height: .7; letter-spacing: -.06em; }
 .metric-label { margin: 18px 0 0; font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .04em; }
 .metric-note { margin: 6px 0 0; font-size: 9px; font-family: "DM Mono", monospace; letter-spacing: .04em; }
@@ -176,6 +180,10 @@ h2 { font-size: clamp(3rem, 5.1vw, 5.2rem); line-height: .92; }
 .outcome-list article { display: grid; grid-template-columns: 36px 1fr; gap: 12px; padding: 19px 0 20px; border-bottom: 1px solid rgba(16,21,32,.23); }
 .outcome-list svg { color: #1547ab; }
 .outcome-list span { display: block; margin-bottom: 9px; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .12em; color: #1547ab; }
+.outcome-label-row { display: flex; align-items: center; gap: 8px; }
+.outcome-label-row span { margin-bottom: 9px; }
+.outcome-label-row .metric-info-button { width: 19px; height: 19px; margin-top: -8px; color: #1547ab; }
+.outcome-label-row .metric-info-button:hover, .outcome-label-row .metric-info-button:focus-visible { color: #101520; }
 .outcome-list p { max-width: 520px; margin: 0; font-size: 13px; line-height: 1.6; color: rgba(16,21,32,.72); }
 .outcome-list strong { color: #101520; }
 
